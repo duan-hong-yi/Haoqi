@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('查看个人申请管理')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-studentapply-edit" th:object="${studentApply}">
+        <h4 class="form-header h4">个人申请管理信息</h4>
+        <input name="id" th:field="*{id}" type="hidden" readonly="readonly">
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">学员ID：</label>
+            <div class="col-sm-8">
+                <input name="studentId" th:field="*{studentId}" class="form-control" type="text" required
+                       readonly="readonly">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">课程ID：</label>
+            <div class="col-sm-8">
+                <input name="courseId" th:field="*{courseId}" class="form-control" type="text" required
+                       readonly="readonly">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">申请状态：</label>
+            <div class="col-sm-8">
+                <div class="radio-box" th:each="dict : ${@dict.getType('sys_check_status')}">
+                    <input type="radio" th:id="${'checkStatus_' + dict.dictCode}" name="checkStatus"
+                           th:value="${dict.dictValue}" th:field="*{checkStatus}" required disabled="disabled">
+                    <label th:for="${'checkStatus_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">学员姓名：</label>
+            <div class="col-sm-8">
+                <input name="courseId" th:field="*{student.name}" class="form-control" type="text" required
+                       readonly="readonly">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">学员岗位：</label>
+            <div class="col-sm-8">
+                <input name="courseId" th:field="*{student.duty}" class="form-control" type="text" required
+                       readonly="readonly">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">学员技术水平：</label>
+            <div class="col-sm-8">
+                <input name="courseId" th:field="*{student.level}" class="form-control" type="text" required
+                       readonly="readonly">
+            </div>
+        </div>
+        <h4 class="form-header h4">培训课程管理信息</h4>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-12 select-table table-striped">
+                    <table id="bootstrap-table"></table>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "system/studentapply";
+    $("#form-studentapply-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-studentapply-edit').serialize());
+        }
+    }
+
+    $(function () {
+        var options = {
+            data: [[${studentApply.courseList}]],
+            pagination: false,
+            showSearch: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            sidePagination: "client",
+            columns: [{
+                checkbox: false
+            },
+                {
+                    field: 'topic',
+                    align: 'center',
+                    title: '课程主题',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].topic' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'lecturerId',
+                    align: 'center',
+                    title: '讲师ID',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].lecturerId' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'location',
+                    align: 'center',
+                    title: '课程地点',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].location' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'startTime',
+                    align: 'center',
+                    title: '开始日期',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].startTime' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'endTime',
+                    align: 'center',
+                    title: '结束日期',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].endTime' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'singleTime',
+                    align: 'center',
+                    title: '单次课程时长',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].singleTime' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'courseNum',
+                    align: 'center',
+                    title: '课程数量',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].courseNum' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'price',
+                    align: 'center',
+                    title: '价格',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].price' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                },
+
+                {
+                    field: 'capacity',
+                    align: 'center',
+                    title: '课程容量',
+                    formatter: function (value, row, index) {
+                        var html = $.common.sprintf("<input class='form-control' type='text' name='courseList[%s].capacity' value='%s'readonly='readonly'>", index, value);
+                        return html;
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+
+    function addRow() {
+        var count = $("#" + table.options.id).bootstrapTable('getData').length;
+        var row = {
+            index: $.table.serialNumber(count),
+            topic: "",
+            lecturerId: "",
+            location: "",
+            startTime: "",
+            endTime: "",
+            singleTime: "",
+            courseNum: "",
+            price: "",
+            capacity: "",
+        }
+        sub.addRow(row);
+    }
+</script>
+</body>
+</html>

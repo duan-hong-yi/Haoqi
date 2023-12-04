@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('培训课程管理列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>课程主题：</label>
+                                <input type="text" name="topic"/>
+                            </li>
+                            <li>
+                                <label>讲师ID：</label>
+                                <input type="text" name="lecturerId"/>
+                            </li>
+                            <li>
+                                <label>课程地点：</label>
+                                <input type="text" name="location"/>
+                            </li>
+                            <li>
+                                <label>开始日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择开始日期" name="startTime"/>
+                            </li>
+                            <li>
+                                <label>结束日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择结束日期" name="endTime"/>
+                            </li>
+                            <li>
+                                <label>单次课程时长：</label>
+                                <input type="text" name="singleTime"/>
+                            </li>
+                            <li>
+                                <label>课程数量：</label>
+                                <input type="text" name="courseNum"/>
+                            </li>
+                            <li>
+                                <label>价格：</label>
+                                <input type="text" name="price"/>
+                            </li>
+                            <li>
+                                <label>课程容量：</label>
+                                <input type="text" name="capacity"/>
+                            </li>
+                            <li>
+                                <label>课程状态：</label>
+                                <select name="courseStatus" th:with="type=${@dict.getType('sys_course_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:course:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:course:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:course:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:course:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:course:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:course:remove')}]];
+        var courseStatusDatas = [[${@dict.getType('sys_course_status')}]];
+        var prefix = ctx + "system/course";
+        function buildHTML()
+        {
+            alert("页面已成功发布到公司网页！")
+        }
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                //createUrl: ctx + "monitor/job/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                missionUrl: ctx + "monitor/job/add",
+                modalName: "培训课程",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'id',
+                    title: '课程ID',
+                    visible: false
+                },
+                {
+                    field: 'topic',
+                    title: '课程主题'
+                },
+                {
+                    field: 'lecturerId',
+                    title: '讲师ID'
+                },
+                {
+                    field: 'location',
+                    title: '课程地点'
+                },
+                {
+                    field: 'startTime',
+                    title: '开始日期'
+                },
+                {
+                    field: 'endTime',
+                    title: '结束日期'
+                },
+                {
+                    field: 'singleTime',
+                    title: '单次课程时长'
+                },
+                {
+                    field: 'courseNum',
+                    title: '课程数量'
+                },
+                {
+                    field: 'price',
+                    title: '价格'
+                },
+                {
+                    field: 'capacity',
+                    title: '课程容量'
+                },
+                {
+                    field: 'courseStatus',
+                    title: '课程状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(courseStatusDatas, value);
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        actions.push('<a class="btn btn-success btn-xs '+'" href="javascript:void(0)" onclick="buildHTML()"><i class="fa fa-edit"></i>生成页面</a>');
+                        actions.push('<a class="btn btn-success btn-xs ' +'" href="javascript:void(0)" onclick="$.operate.createMission()"><i class="fa fa-edit"></i>生成定时任务</a>');
+
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

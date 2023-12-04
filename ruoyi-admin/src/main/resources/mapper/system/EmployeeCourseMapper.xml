@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EmployeeCourseMapper">
+    
+    <resultMap type="EmployeeCourse" id="EmployeeCourseResult">
+        <result property="id"    column="id"    />
+        <result property="employeeUserId"    column="employee_user_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="completeDate"    column="complete_date"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectEmployeeCourseVo">
+        select id, employee_user_id, course_id, complete_date, status from employee_course
+    </sql>
+
+    <select id="selectEmployeeCourseList" parameterType="EmployeeCourse" resultMap="EmployeeCourseResult">
+        <include refid="selectEmployeeCourseVo"/>
+        <where>  
+            <if test="employeeUserId != null "> and employee_user_id = #{employeeUserId}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="completeDate != null "> and complete_date = #{completeDate}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectEmployeeCourseById" parameterType="Long" resultMap="EmployeeCourseResult">
+        <include refid="selectEmployeeCourseVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEmployeeCourse" parameterType="EmployeeCourse" useGeneratedKeys="true" keyProperty="id">
+        insert into employee_course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeeUserId != null">employee_user_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="completeDate != null">complete_date,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeeUserId != null">#{employeeUserId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="completeDate != null">#{completeDate},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEmployeeCourse" parameterType="EmployeeCourse">
+        update employee_course
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="employeeUserId != null">employee_user_id = #{employeeUserId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="completeDate != null">complete_date = #{completeDate},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEmployeeCourseById" parameterType="Long">
+        delete from employee_course where id = #{id}
+    </delete>
+
+    <delete id="deleteEmployeeCourseByIds" parameterType="String">
+        delete from employee_course where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

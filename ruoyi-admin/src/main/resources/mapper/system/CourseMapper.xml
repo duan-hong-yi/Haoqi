@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CourseMapper">
+    
+    <resultMap type="Course" id="CourseResult">
+        <result property="id"    column="id"    />
+        <result property="topic"    column="topic"    />
+        <result property="lecturerId"    column="lecturer_id"    />
+        <result property="location"    column="location"    />
+        <result property="startTime"    column="startTime"    />
+        <result property="endTime"    column="endTime"    />
+        <result property="singleTime"    column="singleTime"    />
+        <result property="courseNum"    column="courseNum"    />
+        <result property="price"    column="price"    />
+        <result property="capacity"    column="capacity"    />
+        <result property="courseStatus"    column="course_status"    />
+    </resultMap>
+
+    <resultMap type="EmployeeCourse" id="EmployeeCourseResult">
+        <result property="id"    column="id"    />
+        <result property="employeeUserId"    column="employee_user_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="completeDate"    column="complete_date"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectCourseVo">
+        select id, topic, lecturer_id, location, startTime, endTime, singleTime, courseNum, price, capacity, course_status from course
+    </sql>
+
+    <select id="selectCourseList" parameterType="Course" resultMap="CourseResult">
+        <include refid="selectCourseVo"/>
+        <where>  
+            <if test="topic != null  and topic != ''"> and topic = #{topic}</if>
+            <if test="lecturerId != null "> and lecturer_id = #{lecturerId}</if>
+            <if test="location != null  and location != ''"> and location = #{location}</if>
+            <if test="startTime != null "> and startTime = #{startTime}</if>
+            <if test="endTime != null "> and endTime = #{endTime}</if>
+            <if test="singleTime != null "> and singleTime = #{singleTime}</if>
+            <if test="courseNum != null "> and courseNum = #{courseNum}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="capacity != null "> and capacity = #{capacity}</if>
+            <if test="courseStatus != null "> and course_status = #{courseStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseById" parameterType="Long" resultMap="CourseResult">
+        <include refid="selectCourseVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectEmployeeCourseById" parameterType="Long" resultMap="EmployeeCourseResult">
+        select *
+        from employee_course
+        where course_id = #{id}
+    </select>
+
+    <insert id="insertCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="id">
+        insert into course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="topic != null and topic != ''">topic,</if>
+            <if test="lecturerId != null">lecturer_id,</if>
+            <if test="location != null">location,</if>
+            <if test="startTime != null">startTime,</if>
+            <if test="endTime != null">endTime,</if>
+            <if test="singleTime != null">singleTime,</if>
+            <if test="courseNum != null">courseNum,</if>
+            <if test="price != null">price,</if>
+            <if test="capacity != null">capacity,</if>
+            <if test="courseStatus != null">course_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="topic != null and topic != ''">#{topic},</if>
+            <if test="lecturerId != null">#{lecturerId},</if>
+            <if test="location != null">#{location},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="singleTime != null">#{singleTime},</if>
+            <if test="courseNum != null">#{courseNum},</if>
+            <if test="price != null">#{price},</if>
+            <if test="capacity != null">#{capacity},</if>
+            <if test="courseStatus != null">#{courseStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourse" parameterType="Course">
+        update course
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="topic != null and topic != ''">topic = #{topic},</if>
+            <if test="lecturerId != null">lecturer_id = #{lecturerId},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="startTime != null">startTime = #{startTime},</if>
+            <if test="endTime != null">endTime = #{endTime},</if>
+            <if test="singleTime != null">singleTime = #{singleTime},</if>
+            <if test="courseNum != null">courseNum = #{courseNum},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="capacity != null">capacity = #{capacity},</if>
+            <if test="courseStatus != null">course_status = #{courseStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateEmployeeCourse" parameterType="EmployeeCourse">
+        update employee_course
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="employeeUserId != null">employee_user_id = #{employeeUserId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="completeDate != null">complete_date = #{completeDate},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseById" parameterType="Long">
+        delete from course where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseByIds" parameterType="String">
+        delete from course where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

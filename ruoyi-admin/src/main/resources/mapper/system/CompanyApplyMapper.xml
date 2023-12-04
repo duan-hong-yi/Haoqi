@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CompanyApplyMapper">
+    
+    <resultMap type="CompanyApply" id="CompanyApplyResult">
+        <result property="id"    column="id"    />
+        <result property="companyUserId"    column="company_user_id"    />
+        <result property="topic"    column="topic"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="checkStatus"    column="check_status"    />
+        <result property="studentNumPrediction"    column="student_num_prediction"    />
+    </resultMap>
+
+    <resultMap type="Company" id="CompanyResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+    </resultMap>
+
+    <sql id="selectCompanyApplyVo">
+        select id, company_user_id, topic, company_id, check_status, student_num_prediction from company_apply
+    </sql>
+
+    <select id="selectCompanyApplyList" parameterType="CompanyApply" resultMap="CompanyApplyResult">
+        <include refid="selectCompanyApplyVo"/>
+        <where>  
+            <if test="companyUserId != null "> and company_user_id = #{companyUserId}</if>
+            <if test="topic != null  and topic != ''"> and topic = #{topic}</if>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="checkStatus != null  and checkStatus != ''"> and check_status = #{checkStatus}</if>
+            <if test="studentNumPrediction != null "> and student_num_prediction = #{studentNumPrediction}</if>
+        </where>
+    </select>
+
+    <select id="selectCompanyById" parameterType="Long" resultMap="CompanyResult">
+        select *
+        from company
+        where id = #{id}
+    </select>
+
+    <select id="selectCompanyApplyById" parameterType="Long" resultMap="CompanyApplyResult">
+        <include refid="selectCompanyApplyVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCompanyApply" parameterType="CompanyApply" useGeneratedKeys="true" keyProperty="id">
+        insert into company_apply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyUserId != null">company_user_id,</if>
+            <if test="topic != null and topic != ''">topic,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="checkStatus != null and checkStatus != ''">check_status,</if>
+            <if test="studentNumPrediction != null">student_num_prediction,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyUserId != null">#{companyUserId},</if>
+            <if test="topic != null and topic != ''">#{topic},</if>
+            <if test="companyId != null">#{companyId},</if>
+            <if test="checkStatus != null and checkStatus != ''">#{checkStatus},</if>
+            <if test="studentNumPrediction != null">#{studentNumPrediction},</if>
+         </trim>
+    </insert>
+    <insert id="insertEmployeeCourse" parameterType="EmployeeCourse" useGeneratedKeys="true" keyProperty="id">
+        insert into employee_course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeeUserId != null">employee_user_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="completeDate != null">complete_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeeUserId != null">#{employeeUserId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="completeDate != null">#{completeDate},</if>
+        </trim>
+    </insert>
+    <insert id="insertCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="id">
+        insert into course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="topic != null and topic != ''">topic,</if>
+            <if test="lecturerId != null">lecturer_id,</if>
+            <if test="location != null">location,</if>
+            <if test="startTime != null">startTime,</if>
+            <if test="endTime != null">endTime,</if>
+            <if test="singleTime != null">singleTime,</if>
+            <if test="courseNum != null">courseNum,</if>
+            <if test="price != null">price,</if>
+            <if test="capacity != null">capacity,</if>
+            <if test="courseStatus != null">course_status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="topic != null and topic != ''">#{topic},</if>
+            <if test="lecturerId != null">#{lecturerId},</if>
+            <if test="location != null">#{location},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="singleTime != null">#{singleTime},</if>
+            <if test="courseNum != null">#{courseNum},</if>
+            <if test="price != null">#{price},</if>
+            <if test="capacity != null">#{capacity},</if>
+            <if test="courseStatus != null">#{courseStatus},</if>
+        </trim>
+    </insert>
+    <update id="updateCompanyApply" parameterType="CompanyApply">
+        update company_apply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyUserId != null">company_user_id = #{companyUserId},</if>
+            <if test="topic != null and topic != ''">topic = #{topic},</if>
+            <if test="companyId != null">company_id = #{companyId},</if>
+            <if test="checkStatus != null and checkStatus != ''">check_status = #{checkStatus},</if>
+            <if test="studentNumPrediction != null">student_num_prediction = #{studentNumPrediction},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCompanyApplyById" parameterType="Long">
+        delete from company_apply where id = #{id}
+    </delete>
+
+    <delete id="deleteCompanyApplyByIds" parameterType="String">
+        delete from company_apply where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StudentApplyMapper">
+    
+    <resultMap type="StudentApply" id="StudentApplyResult">
+        <result property="id"    column="id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="checkStatus"    column="check_status"    />
+    </resultMap>
+
+    <resultMap id="StudentApplyCourseResult" type="StudentApply" extends="StudentApplyResult">
+        <collection property="courseList" notNullColumn="sub_id" javaType="java.util.List" resultMap="CourseResult" />
+    </resultMap>
+
+    <resultMap type="Course" id="CourseResult">
+        <result property="id"    column="sub_id"    />
+        <result property="topic"    column="sub_topic"    />
+        <result property="lecturerId"    column="sub_lecturer_id"    />
+        <result property="location"    column="sub_location"    />
+        <result property="startTime"    column="sub_startTime"    />
+        <result property="endTime"    column="sub_endTime"    />
+        <result property="singleTime"    column="sub_singleTime"    />
+        <result property="courseNum"    column="sub_courseNum"    />
+        <result property="price"    column="sub_price"    />
+        <result property="capacity"    column="sub_capacity"    />
+    </resultMap>
+
+    <resultMap type="Student" id="StudentResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="sex"    column="sex"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="duty"    column="duty"    />
+        <result property="level"    column="level"    />
+        <result property="email"    column="email"    />
+        <result property="phone"    column="phone"    />
+        <result property="companyId"    column="company_id"    />
+    </resultMap>
+
+    <resultMap id="StudentApplyStudentCourseRecordResult" type="StudentCourseRecord" extends="StudentApplyResult">
+        <collection property="studentCourseRecordList" notNullColumn="sub_id" javaType="java.util.List" resultMap="StudentCourseRecordResult" />
+    </resultMap>
+
+    <resultMap type="StudentCourseRecord" id="StudentCourseRecordResult">
+        <result property="id"    column="id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="payStatus"    column="pay_status"    />
+        <result property="signInStatus"    column="sign_in_status"    />
+    </resultMap>
+
+    <sql id="selectStudentApplyVo">
+        select id, student_id, course_id, check_status from student_apply
+    </sql>
+
+    <select id="selectStudentApplyList" parameterType="StudentApply" resultMap="StudentApplyResult">
+        <include refid="selectStudentApplyVo"/>
+        <where>  
+            <if test="studentId != null "> and student_id = #{studentId}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="checkStatus != null  and checkStatus != ''"> and check_status = #{checkStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectStudentApplyById" parameterType="Long" resultMap="StudentApplyCourseResult">
+        select a.id, a.student_id, a.course_id, a.check_status,
+ b.id as sub_id, b.topic as sub_topic, b.lecturer_id as sub_lecturer_id, b.location as sub_location, b.startTime as sub_startTime, b.endTime as sub_endTime, b.singleTime as sub_singleTime, b.courseNum as sub_courseNum, b.price as sub_price, b.capacity as sub_capacity
+        from student_apply a
+        left join course b on b.id = a.course_id
+        where a.id = #{id}
+    </select>
+
+    <select id="selectStudentById" parameterType="Long" resultMap="StudentResult">
+        select *
+        from student
+        where id = #{id}
+    </select>
+        
+    <insert id="insertStudentApply" parameterType="StudentApply" useGeneratedKeys="true" keyProperty="id">
+        insert into student_apply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">student_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="checkStatus != null and checkStatus != ''">check_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">#{studentId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="checkStatus != null and checkStatus != ''">#{checkStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStudentApply" parameterType="StudentApply">
+        update student_apply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="checkStatus != null and checkStatus != ''">check_status = #{checkStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStudentApplyById" parameterType="Long">
+        delete from student_apply where id = #{id}
+    </delete>
+
+    <delete id="deleteStudentApplyByIds" parameterType="String">
+        delete from student_apply where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteCourseByIds" parameterType="String">
+        delete from course where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCourseById" parameterType="Long">
+        delete from course where id = #{id}
+    </delete>
+
+    <insert id="batchCourse">
+        insert into course( id, topic, lecturer_id, location, startTime, endTime, singleTime, courseNum, price, capacity) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.topic}, #{item.lecturerId}, #{item.location}, #{item.startTime}, #{item.endTime}, #{item.singleTime}, #{item.courseNum}, #{item.price}, #{item.capacity})
+        </foreach>
+    </insert>
+
+    <insert id="insertStudentCourseRecord" parameterType="StudentCourseRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into student_course_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">student_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="payStatus != null and payStatus != ''">pay_status,</if>
+            <if test="signInStatus != null and signInStatus != ''">sign_in_status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">#{studentId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="payStatus != null and payStatus != ''">#{payStatus},</if>
+            <if test="signInStatus != null and signInStatus != ''">#{signInStatus},</if>
+        </trim>
+    </insert>
+
+</mapper>

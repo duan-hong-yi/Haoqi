@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('企业级委托管理列表')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>企业申请用户ID：</label>
+                            <input type="text" name="companyUserId"/>
+                        </li>
+                        <li>
+                            <label>委托培训主题：</label>
+                            <input type="text" name="topic"/>
+                        </li>
+                        <li>
+                            <label>委托公司ID：</label>
+                            <input type="text" name="companyId"/>
+                        </li>
+                        <li>
+                            <label>申请审核状况：</label>
+                            <select name="checkStatus" th:with="type=${@dict.getType('sys_check_status')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>预期学生数量：</label>
+                            <input type="text" name="studentNumPrediction"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:companyapply:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:companyapply:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:companyapply:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:companyapply:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:companyapply:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:companyapply:remove')}]];
+    var checkStatusDatas = [[${@dict.getType('sys_check_status')}]];
+    var detailFlag = [[${@permission.hasPermi('system:companyapply:detail')}]];
+    var prefix = ctx + "system/companyapply";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            detailUrl: prefix + "/detail/{id}",
+            modalName: "企业级委托管理",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'id',
+                    title: '申请ID',
+                    visible: false
+                },
+                {
+                    field: 'companyName',
+                    title: '公司名称',
+                },
+                {
+                    field: 'companyUserId',
+                    title: '企业申请用户ID'
+                },
+                {
+                    field: 'topic',
+                    title: '委托培训主题'
+                },
+                {
+                    field: 'companyId',
+                    title: '委托公司ID'
+                },
+                {
+                    field: 'checkStatus',
+                    title: '申请审核状况',
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(checkStatusDatas, value);
+                    }
+                },
+                {
+                    field: 'studentNumPrediction',
+                    title: '预期学生数量'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>审核</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>撤回</a>');
+                        actions.push('<a class="btn btn-success btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="$.operate.detail(\'' + row.id + '\')"><i class="fa fa-edit"></i>查看</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

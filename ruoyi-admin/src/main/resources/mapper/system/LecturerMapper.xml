@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.LecturerMapper">
+    
+    <resultMap type="Lecturer" id="LecturerResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="title"    column="title"    />
+        <result property="expertise"    column="expertise"    />
+        <result property="email"    column="email"    />
+        <result property="phone"    column="phone"    />
+    </resultMap>
+
+    <sql id="selectLecturerVo">
+        select id, name, title, expertise, email, phone from lecturer
+    </sql>
+
+    <select id="selectLecturerList" parameterType="Lecturer" resultMap="LecturerResult">
+        <include refid="selectLecturerVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="expertise != null  and expertise != ''"> and expertise = #{expertise}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+        </where>
+    </select>
+    
+    <select id="selectLecturerById" parameterType="Long" resultMap="LecturerResult">
+        <include refid="selectLecturerVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertLecturer" parameterType="Lecturer" useGeneratedKeys="true" keyProperty="id">
+        insert into lecturer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="expertise != null and expertise != ''">expertise,</if>
+            <if test="email != null and email != ''">email,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="expertise != null and expertise != ''">#{expertise},</if>
+            <if test="email != null and email != ''">#{email},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLecturer" parameterType="Lecturer">
+        update lecturer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="expertise != null and expertise != ''">expertise = #{expertise},</if>
+            <if test="email != null and email != ''">email = #{email},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLecturerById" parameterType="Long">
+        delete from lecturer where id = #{id}
+    </delete>
+
+    <delete id="deleteLecturerByIds" parameterType="String">
+        delete from lecturer where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

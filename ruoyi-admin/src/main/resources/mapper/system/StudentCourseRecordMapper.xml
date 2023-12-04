@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StudentCourseRecordMapper">
+    
+    <resultMap type="StudentCourseRecord" id="StudentCourseRecordResult">
+        <result property="id"    column="id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="payStatus"    column="pay_status"    />
+        <result property="signInStatus"    column="sign_in_status"    />
+    </resultMap>
+
+    <resultMap type="Student" id="StudentResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="sex"    column="sex"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="duty"    column="duty"    />
+        <result property="level"    column="level"    />
+        <result property="email"    column="email"    />
+        <result property="phone"    column="phone"    />
+        <result property="companyId"    column="company_id"    />
+    </resultMap>
+
+    <resultMap type="Course" id="CourseResult">
+        <result property="id"    column="id"    />
+        <result property="topic"    column="topic"    />
+        <result property="lecturerId"    column="lecturer_id"    />
+        <result property="location"    column="location"    />
+        <result property="startTime"    column="startTime"    />
+        <result property="endTime"    column="endTime"    />
+        <result property="singleTime"    column="singleTime"    />
+        <result property="courseNum"    column="courseNum"    />
+        <result property="price"    column="price"    />
+        <result property="capacity"    column="capacity"    />
+        <result property="courseStatus"    column="course_status"    />
+    </resultMap>
+
+    <sql id="selectStudentCourseRecordVo">
+        select id, student_id, course_id, pay_status, sign_in_status from student_course_record
+    </sql>
+
+    <select id="selectStudentById" parameterType="Long" resultMap="StudentResult">
+        select *
+        from student
+        where id = #{id}
+    </select>
+
+    <select id="selectCourseById" parameterType="Long" resultMap="CourseResult">
+        select *
+        from course
+        where id = #{id}
+    </select>
+
+    <select id="selectStudentCourseRecordList" parameterType="StudentCourseRecord" resultMap="StudentCourseRecordResult">
+        <include refid="selectStudentCourseRecordVo"/>
+        <where>  
+            <if test="studentId != null "> and student_id = #{studentId}</if>
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="payStatus != null  and payStatus != ''"> and pay_status = #{payStatus}</if>
+            <if test="signInStatus != null  and signInStatus != ''"> and sign_in_status = #{signInStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectStudentCourseRecordById" parameterType="Long" resultMap="StudentCourseRecordResult">
+        <include refid="selectStudentCourseRecordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertStudentCourseRecord" parameterType="StudentCourseRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into student_course_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">student_id,</if>
+            <if test="courseId != null">course_id,</if>
+            <if test="payStatus != null and payStatus != ''">pay_status,</if>
+            <if test="signInStatus != null and signInStatus != ''">sign_in_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">#{studentId},</if>
+            <if test="courseId != null">#{courseId},</if>
+            <if test="payStatus != null and payStatus != ''">#{payStatus},</if>
+            <if test="signInStatus != null and signInStatus != ''">#{signInStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStudentCourseRecord" parameterType="StudentCourseRecord">
+        update student_course_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="payStatus != null and payStatus != ''">pay_status = #{payStatus},</if>
+            <if test="signInStatus != null and signInStatus != ''">sign_in_status = #{signInStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStudentCourseRecordById" parameterType="Long">
+        delete from student_course_record where id = #{id}
+    </delete>
+
+    <delete id="deleteStudentCourseRecordByIds" parameterType="String">
+        delete from student_course_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
