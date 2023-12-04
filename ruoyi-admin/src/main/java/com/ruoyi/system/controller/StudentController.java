@@ -170,7 +170,6 @@ public class StudentController extends BaseController
         mmap.put("student", student);
         return prefix + "/edit";
     }
-
     /**
      * 修改保存管理学员资料
      */

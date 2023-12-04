@@ -1,5 +1,11 @@
 package com.ruoyi.system.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -105,7 +111,35 @@ public class CourseController extends BaseController
         mmap.put("course", course);
         return prefix + "/edit";
     }
-
+    @RequiresPermissions("system:course:edit")
+    @PostMapping("/buildHTML")
+    @ResponseBody
+    public AjaxResult buildHTML(String id) throws IOException {
+        Course course = courseService.selectCourseById(Long.parseLong(id));
+        generateHTML(course);
+        return toAjax(true);
+    }
+    public byte[] generateHTML(Course course) throws IOException {
+        String front = "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <title>Title</title>\n" +
+                "    <p>\n" +
+                "      培训通知:\n" +
+                "    </p>\n" +
+                "  <p>";
+        String tail = " </p>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "\n" +
+                "</body>\n" +
+                "</html>";
+        String content = course.getTopic()+"  "
+                +course.getLocation()+"   "+course.getStartTime()+"   "+course.getEndTime();
+        Files.write(Paths.get("temp.html"),(front+content+tail).getBytes(StandardCharsets.UTF_8));
+        return (front+content+tail).getBytes(StandardCharsets.UTF_8);
+    }
     /**
      * 修改保存培训课程管理
      */
